@@ -23,26 +23,26 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
 
     @Override
-    public Item addNewItem(ItemDto item, Long ownerId) {
+    public ItemDto addNewItem(ItemDto item, Long ownerId) {
         validationItem(item, ownerId);
 
         return itemRepository.addNewItem(item, ownerId);
     }
 
     @Override
-    public Item updateItem(Long itemId, ItemDto item, Long ownerId) {
+    public ItemDto updateItem(Long itemId, ItemDto item, Long ownerId) {
         checkExistOwner(ownerId);
         return itemRepository.updateItem(itemId, item, ownerId);
     }
 
     @Override
-    public List<Item> getItemsBuUserId(Long userId) {
-        return itemRepository.getItemsBuOwnerId(userId);
+    public List<Item> getItemsByUserId(Long userId) {
+        return itemRepository.getItemsByOwnerId(userId);
     }
 
     @Override
-    public Item getItemBuId(Long itemId) {
-        return itemRepository.getItemBuId(itemId);
+    public Item getItemById(Long itemId) {
+        return itemRepository.getItemById(itemId);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkExistOwner(Long ownerId) {
-        if (Objects.isNull(userService.getUserBuId(ownerId))) {
+        if (Objects.isNull(userService.getUserById(ownerId))) {
             log.error("Пользователь с id = " + ownerId + " не найден");
             throw new NotFoundException("Пользователь с id = " + ownerId + " не найден");
         }

@@ -33,12 +33,12 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public UserDto getUserBuId(@PathVariable("userId") Long userId) {
-        return userService.getUserBuId(userId);
+        return userService.getUserById(userId);
     }
 
     @DeleteMapping("/{userId}")
     public void deleteUserBuID(@Positive @PathVariable("userId") Long userId) {
-        userService.deleteUserBuId(userId);
+        userService.deleteUserById(userId);
     }
 
 }

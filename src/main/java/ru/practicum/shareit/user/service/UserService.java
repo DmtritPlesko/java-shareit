@@ -8,8 +8,8 @@ public interface UserService {
 
     UserDto updateUser(Long userId, UserDto user);
 
-    UserDto getUserBuId(Long userId);
+    UserDto getUserById(Long userId);
 
-    void deleteUserBuId(Long userId);
+    void deleteUserById(Long userId);
 
 }

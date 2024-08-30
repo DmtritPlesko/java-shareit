@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -25,31 +25,28 @@ public class UserServiceImpl implements UserService {
     public UserDto addNewUser(UserDto user) {
 
         validation(user);
-        final User user1 = userRepository.addNewUser(userMapper.parseUserDtoInUser(user));
-
-        return userMapper.parseUserInUserDto(user1);
+        return userRepository.addNewUser(userMapper.parseUserDtoInUser(user));
     }
 
     @Override
     public UserDto updateUser(Long userId, UserDto user) {
-        searchDuplicateEmailBuUser(user);
-        final User user1 = userRepository.updateUser(userId, user);
+        searchDuplicateEmailByUser(user);
 
-        return userMapper.parseUserInUserDto(user1);
+        return userRepository.updateUser(userId, user);
     }
 
     @Override
-    public UserDto getUserBuId(Long userId) {
+    public UserDto getUserById(Long userId) {
         checkId(userId);
 
-        final Optional<User> user = userRepository.getUserBuId(userId);
+        final Optional<User> user = userRepository.getUserById(userId);
 
         return userMapper.parseUserInUserDto(user.get());
     }
 
     @Override
-    public void deleteUserBuId(Long userId) {
-        userRepository.deleteUserBuId(userId);
+    public void deleteUserById(Long userId) {
+        userRepository.deleteUserById(userId);
     }
 
     private void validation(UserDto userDto) {
@@ -64,10 +61,10 @@ public class UserServiceImpl implements UserService {
             log.error("Почта не може быть пустой");
             throw new ValidationException(startMessage + "Почта не може быть пустой");
         }
-        searchDuplicateEmailBuUser(userDto);
+        searchDuplicateEmailByUser(userDto);
     }
 
-    private void searchDuplicateEmailBuUser(UserDto userDto) {
+    private void searchDuplicateEmailByUser(UserDto userDto) {
         Optional<User> userOptional = userRepository.findAll().stream()
                 .filter(elem -> Objects.equals(elem.getEmail(), userDto.getEmail()))
                 .findFirst();
@@ -81,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
     private void checkId(Long userId) {
 
-        if (userRepository.getUserBuId(userId).isEmpty()) {
+        if (userRepository.getUserById(userId).isEmpty()) {
             log.error("Пользователь с id = " + userId + " не найден");
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }

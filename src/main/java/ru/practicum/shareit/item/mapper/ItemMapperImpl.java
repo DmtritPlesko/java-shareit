@@ -24,4 +24,18 @@ public class ItemMapperImpl implements ItemMapper {
 
         return item;
     }
+
+    @Override
+    public ItemDto parseItemInItemDto(Item item) {
+
+        ItemDto itemDto = new ItemDto();
+
+        itemDto.setId(item.getId());
+        itemDto.setDescription(item.getDescription());
+        itemDto.setName(item.getName());
+        itemDto.setAvailable(item.getAvailable());
+
+        return itemDto;
+
+    }
 }

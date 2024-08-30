@@ -21,14 +21,14 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public Item addNewItem(@RequestBody ItemDto item,
+    public ItemDto addNewItem(@RequestBody ItemDto item,
                            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
 
         return itemService.addNewItem(item, ownerId);
     }
 
     @PatchMapping("/{itemId}")
-    public Item updateItem(@PathVariable("itemId") @Positive Long itemId,
+    public ItemDto updateItem(@PathVariable("itemId") @Positive Long itemId,
                            @RequestBody ItemDto item,
                            @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId) {
         return itemService.updateItem(itemId, item, ownerId);
@@ -37,12 +37,12 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public Item getItemBuId(@PathVariable("itemId") Long itemId,
                             @RequestHeader("X-Sharer-User-Id") Long ownerId) {
-        return itemService.getItemBuId(itemId);
+        return itemService.getItemById(itemId);
     }
 
     @GetMapping
     public List<Item> getItemsBuOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
-        return itemService.getItemsBuUserId(ownerId);
+        return itemService.getItemsByUserId(ownerId);
     }
 
     @GetMapping("/search")

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 
+import java.util.HashMap;
 import java.util.List;
 
 import ru.practicum.shareit.item.model.Item;
@@ -19,23 +20,23 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private final Map<Long, Item> itemMap;
+    private final Map<Long, Item> itemMap = new HashMap<>();
     private final ItemMapper itemMapper;
 
     @Override
-    public Item addNewItem(ItemDto item, Long ownerId) {
+    public ItemDto addNewItem(ItemDto item, Long ownerId) {
         item.setId(nextValue());
         Item item1 = itemMapper.parseItemDtoInItem(item);
         item1.setOwner(ownerId);
         itemMap.put(item1.getId(), item1);
         log.info("Добавление предмета id = {} name = {}", item1.getId(), item1.getName());
-        return item1;
+        return itemMapper.parseItemInItemDto(item1);
     }
 
     @Override
-    public Item updateItem(Long itemId, ItemDto item, Long ownerId) {
+    public ItemDto updateItem(Long itemId, ItemDto item, Long ownerId) {
 
-        Item item1 = getItemBuId(itemId);
+        Item item1 = getItemById(itemId);
 
         if (Objects.nonNull(item.getName())) {
             item1.setName(item.getName());
@@ -50,11 +51,11 @@ public class ItemRepositoryImpl implements ItemRepository {
         }
 
         log.info("Обновление предмета  с id = {}", item.getId());
-        return item1;
+        return itemMapper.parseItemInItemDto(item1);
     }
 
     @Override
-    public List<Item> getItemsBuOwnerId(Long ownerId) {
+    public List<Item> getItemsByOwnerId(Long ownerId) {
         log.info("Все предметы владельца под id = {}", ownerId);
         return itemMap.values().stream()
                 .filter(elem -> Objects.equals(elem.getOwner(), ownerId))
@@ -62,7 +63,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item getItemBuId(Long itemId) {
+    public Item getItemById(Long itemId) {
         return itemMap.values().stream()
                 .filter(elem -> Objects.equals(elem.getId(), itemId))
                 .findFirst()
@@ -72,7 +73,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public List<Item> search(String text, Long ownerId) {
         log.info("Поиск предмета со строкой - {}", text);
-        return getItemsBuOwnerId(ownerId).stream()
+        return getItemsByOwnerId(ownerId).stream()
                 .filter(elem -> (Pattern.matches("^" + text.toLowerCase() + "$", elem.getName().toLowerCase()) ||
                         Pattern.matches("^" + text.toLowerCase() + "$", elem.getDescription().toLowerCase())) &&
                         elem.getAvailable())

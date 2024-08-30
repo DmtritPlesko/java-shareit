@@ -6,4 +6,6 @@ import ru.practicum.shareit.item.model.Item;
 public interface ItemMapper {
 
     Item parseItemDtoInItem(ItemDto itemDto);
+
+    ItemDto parseItemInItemDto(Item item);
 }

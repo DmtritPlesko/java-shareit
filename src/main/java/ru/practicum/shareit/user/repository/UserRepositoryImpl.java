@@ -1,29 +1,33 @@
 package ru.practicum.shareit.user.repository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.*;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
     private Map<Long, User> userMap = new HashMap<>();
+    private final UserMapper userMapper;
 
     @Override
-    public User addNewUser(User user) {
+    public UserDto addNewUser(User user) {
 
         user.setId(nextValue());
         userMap.put(user.getId(), user);
         log.info("Добалвение нового пользователя с id = {}", user.getId());
-        return user;
+        return userMapper.parseUserInUserDto(user);
     }
 
     @Override
-    public User updateUser(Long userId, UserDto user) {
+    public UserDto updateUser(Long userId, UserDto user) {
 
         User user1 = userMap.get(userId);
 
@@ -37,16 +41,16 @@ public class UserRepositoryImpl implements UserRepository {
 
         userMap.put(userId, user1);
         log.info("Обновление пользователя с id = {}", user1.getId());
-        return user1;
+        return userMapper.parseUserInUserDto(user1);
     }
 
     @Override
-    public Optional<User> getUserBuId(Long userId) {
+    public Optional<User> getUserById(Long userId) {
         return Optional.ofNullable(userMap.get(userId));
     }
 
     @Override
-    public void deleteUserBuId(Long userId) {
+    public void deleteUserById(Long userId) {
         log.info("удаление пользователя с id = {}", userId);
         userMap.remove(userId);
     }
