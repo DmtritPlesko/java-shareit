@@ -1,28 +1,21 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(exclude = {"id"})
-public class ItemDto {
+public class UserDto {
 
     Long id;
 
-    @NotBlank
     String name;
 
-    @NotBlank
-    String description;
-
-    @NotBlank
-    Boolean available;
+    @Email
+    String email;
 
 }
