@@ -4,8 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-bookings.
@@ -14,5 +13,13 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingDto {
 
-    List<LocalDate> bookingDate;
+    Long itemId;
+    LocalDateTime start;
+    LocalDateTime end;
+
+    public BookingDto(Long itemId, LocalDateTime star, LocalDateTime end) {
+        this.itemId = itemId;
+        this.start = star;
+        this.end = end;
+    }
 }

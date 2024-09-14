@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 /**
@@ -20,19 +20,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto addNewUser(@Valid @RequestBody UserDto user) {
+    public User addNewUser(@Valid @RequestBody User user) {
         log.info("я зашел в добавление ");
         return userService.addNewUser(user);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable("userId") Long userId,
-                              @Valid @RequestBody UserDto user) {
+    public User updateUser(@PathVariable("userId") Long userId,
+                           @Valid @RequestBody User user) {
         return userService.updateUser(userId, user);
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserBuId(@PathVariable("userId") Long userId) {
+    public User getUserBuId(@PathVariable("userId") Long userId) {
         return userService.getUserById(userId);
     }
 
