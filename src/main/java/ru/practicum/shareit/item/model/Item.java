@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.model;
 
-
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
