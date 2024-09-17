@@ -8,7 +8,8 @@ import ru.practicum.shareit.item.model.Comment;
 public class CommentMapperImpl implements CommentMapper {
     @Override
     public CommentDto parseCommentInCommentDto(Comment comment) {
-        return new CommentDto(comment.getId(), comment.getText(), comment.getItem(), comment.getAuthorId().getName(), comment.getCreated());
+        return new CommentDto(comment.getId(), comment.getText(), comment.getItem(),
+                comment.getAuthorId().getName(), comment.getCreated());
     }
 
     @Override

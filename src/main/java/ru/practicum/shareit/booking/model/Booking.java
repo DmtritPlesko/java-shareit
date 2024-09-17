@@ -40,6 +40,7 @@ public class Booking {
     User booker;
 
     @Column(name = "STATUS")
+    @Enumerated(EnumType.STRING)
     Status status;
 
 }

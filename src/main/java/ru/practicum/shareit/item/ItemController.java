@@ -8,7 +8,6 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemAndCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.item.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
@@ -25,10 +24,10 @@ public class ItemController {
     private final ItemMapper itemMapper;
 
     @PostMapping
-    public ItemDto addNewItem(@RequestBody Item item,
+    public ItemDto addNewItem(@RequestBody ItemDto item,
                               @RequestHeader("X-Sharer-User-Id") Long ownerId) {
-        itemService.addNewItem(item, ownerId);
-        return itemMapper.parseItemInItemDto(item);
+
+        return itemService.addNewItem(item, ownerId);
     }
 
     @PostMapping("/{itemId}/comment")
@@ -40,10 +39,10 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable("itemId") @Positive Long itemId,
-                              @RequestBody Item item,
+                              @RequestBody ItemDto item,
                               @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId) {
-        itemService.updateItem(itemId, item, ownerId);
-        return itemMapper.parseItemInItemDto(item);
+
+        return itemService.updateItem(itemId, item, ownerId);
     }
 
     @GetMapping("/{itemId}")
@@ -53,12 +52,12 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<Item> getItemsBuOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public List<ItemDto> getItemsBuOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.getItemsByUserId(ownerId);
     }
 
     @GetMapping("/search")
-    public List<Item> search(@RequestParam String text,
+    public List<ItemDto> search(@RequestParam String text,
                              @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.search(text, ownerId);
     }

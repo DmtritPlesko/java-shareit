@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +13,10 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemAndCommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemAndCommentDtoMapperImpl;
 import ru.practicum.shareit.item.mapper.comment.CommentMapper;
+import ru.practicum.shareit.item.mapper.item.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -28,6 +28,7 @@ import ru.practicum.shareit.user.service.UserService;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
     private final CommentMapper commentMapper;
@@ -35,11 +36,14 @@ public class ItemServiceImpl implements ItemService {
     private final ItemAndCommentDtoMapperImpl itemAndCommentDtoMapper;
 
     @Override
-    public Item addNewItem(Item item, Long ownerId) {
+    public ItemDto addNewItem(ItemDto item, Long ownerId) {
         validationItem(item, ownerId);
         log.info("Добавление новой вещи");
-        item.setOwner(ownerId);
-        return itemRepository.save(item);
+        Item item1 = itemMapper.parseItemDtoInItem(item);
+        item1.setOwner(ownerId);
+        itemRepository.save(item1);
+
+        return itemMapper.parseItemInItemDto(item1);
     }
 
     @Override
@@ -62,19 +66,29 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item updateItem(Long itemId, Item item, Long ownerId) {
+    public ItemDto updateItem(Long itemId, ItemDto item, Long ownerId) {
         checkExistOwner(ownerId);
-        item.setOwner(ownerId);
+
+        Optional<Item> item1 = itemRepository.findById(itemId);
+
+        item1.get().setDescription(item.getDescription());
+        item1.get().setName(item.getName());
+        item1.get().setAvailable(item.getAvailable());
+        item1.get().setOwner(ownerId);
+
         log.info("Обновление вещи с id = {}", itemId);
-        return itemRepository.save(item);
+        itemRepository.save(item1.get());
+
+        return itemMapper.parseItemInItemDto(item1.get());
     }
 
     @Override
-    public List<Item> getItemsByUserId(Long userId) {
+    public List<ItemDto> getItemsByUserId(Long userId) {
         log.info("Полечение всех вещей пользователя с id = {}", userId);
         userService.getUserById(userId);
         return itemRepository.findAll().stream()
                 .filter(elem -> Objects.equals(elem.getOwner(), userId))
+                .map(itemMapper::parseItemInItemDto)
                 .toList();
     }
 
@@ -92,17 +106,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> search(String text, Long ownerId) {
+    public List<ItemDto> search(String text, Long ownerId) {
         log.info("Поиск вещи по имени или описанию в которых содержится строка = {}", text);
         if (text == null || text.isEmpty() || text.isBlank()) {
             return List.of();
         }
         return itemRepository.search(text, ownerId).stream()
                 .filter(elem -> Objects.equals(elem.getAvailable(), true))
+                .map(itemMapper::parseItemInItemDto)
                 .toList();
     }
 
-    private void validationItem(Item item, Long ownerId) {
+    private void validationItem(ItemDto item, Long ownerId) {
         String starMessage = "Ошибка валидации: ";
 
         if (item.getName() == null) {

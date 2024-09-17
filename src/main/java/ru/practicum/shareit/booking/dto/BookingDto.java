@@ -17,9 +17,9 @@ public class BookingDto {
     LocalDateTime start;
     LocalDateTime end;
 
-    public BookingDto(Long itemId, LocalDateTime star, LocalDateTime end) {
+    public BookingDto(Long itemId, LocalDateTime start, LocalDateTime end) {
         this.itemId = itemId;
-        this.start = star;
+        this.start = start;
         this.end = end;
     }
 }

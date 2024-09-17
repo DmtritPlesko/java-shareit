@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.mapper.ItemAndCommentDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.status.Status;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -38,7 +39,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = bookingMapper.parseBookingDtoInBooking(bookingDto);
 
-        User user = userService.getUserById(ownerId);
+        User user =  userService.getUserById(ownerId);
         Item item = itemAndCommentDtoMapper
                 .parseItemAndCommentDtoInItem(itemService.getItemById(bookingDto.getItemId()));
 
@@ -85,41 +86,30 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getAllBookingByUserId(Long userId, String state) {
 
-        List<Booking> bookings = getAllBooking().stream()
-                .filter(elem -> Objects.equals(elem.getBooker().getId(), userId))
-                .toList();
-
         switch (state) {
             case "CURRENT":
             case "FUTURE": {
-                return bookings.stream()
-                        .filter(elem -> Objects.equals(elem.getStatus(), Status.APPROVED))
-                        .toList();
+                return bookingRepository.findBookingsByUserAndStatus(userId, Status.APPROVED);
             }
             case "PAST": {
-                return bookings.stream()
-                        .filter(elem -> Objects.equals(elem.getStatus(), Status.CANCELED))
-                        .toList();
+                return bookingRepository.findBookingsByUserAndStatus(userId, Status.CANCELED);
             }
             case "WAITING": {
-                return bookings.stream()
-                        .filter(elem -> Objects.equals(elem.getStatus(), Status.WAITING))
-                        .toList();
+                return bookingRepository.findBookingsByUserAndStatus(userId, Status.WAITING);
             }
             case "REJECTED": {
-                return bookings.stream()
-                        .filter(elem -> Objects.equals(elem.getStatus(), Status.REJECTED))
-                        .toList();
+                return bookingRepository.findBookingsByUserAndStatus(userId, Status.REJECTED);
+
             }
             default: {
-                return bookings;
+                return bookingRepository.findBookingsByUserAndStatus(userId, Status.WAITING);
             }
         }
     }
 
     @Override
     public List<Booking> getAllUsersItemBookings(Long ownerId, Status state) {
-        return getAllBooking().stream()
+        return bookingRepository.findAll().stream()
                 .filter(elem -> Objects.equals(elem.getItem().getId(), ownerId))
                 .filter(elem -> Objects.equals(elem.getStatus(), state))
                 .toList();
