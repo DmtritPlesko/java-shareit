@@ -5,12 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -23,30 +22,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto addNewUser(UserDto user) {
-
         validation(user);
-        return userRepository.addNewUser(userMapper.parseUserDtoInUser(user));
+        System.out.println(user);
+
+        return userMapper.parseUserInUserDto(userRepository.save(userMapper.parseUserDtoInUser(user)));
     }
 
     @Override
     public UserDto updateUser(Long userId, UserDto user) {
-        searchDuplicateEmailByUser(user);
+        User user1 = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Нет такого пользователя"));
 
-        return userRepository.updateUser(userId, user);
+        if (user.getName() != null) {
+            user1.setName(user.getName());
+        }
+
+        if (user.getEmail() != null) {
+            user1.setEmail(user.getEmail());
+        }
+
+        return userMapper.parseUserInUserDto(userRepository.save(user1));
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public User getUserById(Long userId) {
         checkId(userId);
 
-        final Optional<User> user = userRepository.getUserById(userId);
-
-        return userMapper.parseUserInUserDto(user.get());
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+        return userOptional.get();
     }
 
     @Override
     public void deleteUserById(Long userId) {
-        userRepository.deleteUserById(userId);
+        userRepository.deleteById(userId);
     }
 
     private void validation(UserDto userDto) {
@@ -61,24 +72,11 @@ public class UserServiceImpl implements UserService {
             log.error("Почта не може быть пустой");
             throw new ValidationException(startMessage + "Почта не може быть пустой");
         }
-        searchDuplicateEmailByUser(userDto);
-    }
-
-    private void searchDuplicateEmailByUser(UserDto userDto) {
-        Optional<User> userOptional = userRepository.findAll().stream()
-                .filter(elem -> Objects.equals(elem.getEmail(), userDto.getEmail()))
-                .findFirst();
-
-        if (userOptional.isPresent()) {
-            log.error("Невозможно добавить пользователя с одинаковым email");
-            throw new IllegalArgumentException("Невозможно добавить пользователя с одинаковым email");
-        }
-
     }
 
     private void checkId(Long userId) {
 
-        if (userRepository.getUserById(userId).isEmpty()) {
+        if (userRepository.findById(userId).isEmpty()) {
             log.error("Пользователь с id = " + userId + " не найден");
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }

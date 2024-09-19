@@ -1,16 +1,25 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.RequiredArgsConstructor;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemAndCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemAndCommentDtoMapperImpl;
+import ru.practicum.shareit.item.mapper.comment.CommentMapper;
+import ru.practicum.shareit.item.mapper.item.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -20,34 +29,93 @@ import ru.practicum.shareit.user.service.UserService;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentMapper commentMapper;
     private final UserService userService;
+    private final ItemAndCommentDtoMapperImpl itemAndCommentDtoMapper;
 
     @Override
     public ItemDto addNewItem(ItemDto item, Long ownerId) {
         validationItem(item, ownerId);
+        log.info("Добавление новой вещи");
+        Item item1 = itemMapper.parseItemDtoInItem(item);
+        item1.setOwner(ownerId);
+        itemRepository.save(item1);
 
-        return itemRepository.addNewItem(item, ownerId);
+        return itemMapper.parseItemInItemDto(item1);
+    }
+
+    @Override
+    public CommentDto addNewComment(Long itemId, CommentDto commentDto, Long userId) {
+
+        Optional<Booking> optionalBooking = bookingRepository.findAll().stream()
+                .filter(elem -> Objects.equals(elem.getItem().getId(), itemId))
+                .findFirst();
+        commentDto.setAuthorName(userService.getUserById(userId).getName());
+        commentDto.setItem(optionalBooking.get().getItem());
+        commentDto.setAuthorName(userService.getUserById(userId).getName());
+        commentDto.setCreated(LocalDateTime.now());
+        if (optionalBooking.get().getBooker().getId().equals(userId) && optionalBooking.get().getEnd().isBefore(commentDto.getCreated())) {
+            commentRepository.save(commentMapper.parseCommentDtoInComment(commentDto));
+            return commentDto;
+
+        }
+
+        throw new ValidationException("Невозможно добавить комментарий до окончания срока аренды");
     }
 
     @Override
     public ItemDto updateItem(Long itemId, ItemDto item, Long ownerId) {
         checkExistOwner(ownerId);
-        return itemRepository.updateItem(itemId, item, ownerId);
+
+        Optional<Item> item1 = itemRepository.findById(itemId);
+
+        item1.get().setDescription(item.getDescription());
+        item1.get().setName(item.getName());
+        item1.get().setAvailable(item.getAvailable());
+        item1.get().setOwner(ownerId);
+
+        log.info("Обновление вещи с id = {}", itemId);
+        itemRepository.save(item1.get());
+
+        return itemMapper.parseItemInItemDto(item1.get());
     }
 
     @Override
-    public List<Item> getItemsByUserId(Long userId) {
-        return itemRepository.getItemsByOwnerId(userId);
+    public List<ItemDto> getItemsByUserId(Long userId) {
+        log.info("Полечение всех вещей пользователя с id = {}", userId);
+        userService.getUserById(userId);
+        return itemRepository.findAll().stream()
+                .filter(elem -> Objects.equals(elem.getOwner(), userId))
+                .map(itemMapper::parseItemInItemDto)
+                .toList();
     }
 
     @Override
-    public Item getItemById(Long itemId) {
-        return itemRepository.getItemById(itemId);
+    public ItemAndCommentDto getItemById(Long itemId) {
+        log.info("Получения вещи с id = {}", itemId);
+        ItemAndCommentDto itemAndCommentDto = itemAndCommentDtoMapper
+                .parseItemInItemAndCommentDto(itemRepository.findById(itemId)
+                        .orElseThrow(() -> new NotFoundException("Предмет не найден")));
+
+        itemAndCommentDto.setComments(commentRepository.findAll().stream()
+                .filter(elem -> Objects.equals(elem.getItem().getId(), itemId))
+                .toList());
+        return itemAndCommentDto;
     }
 
     @Override
-    public List<Item> search(String text, Long ownerId) {
-        return itemRepository.search(text, ownerId);
+    public List<ItemDto> search(String text, Long ownerId) {
+        log.info("Поиск вещи по имени или описанию в которых содержится строка = {}", text);
+        if (text == null || text.isEmpty() || text.isBlank()) {
+            return List.of();
+        }
+        return itemRepository.search(text, ownerId).stream()
+                .filter(elem -> Objects.equals(elem.getAvailable(), true))
+                .map(itemMapper::parseItemInItemDto)
+                .toList();
     }
 
     private void validationItem(ItemDto item, Long ownerId) {
