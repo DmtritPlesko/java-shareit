@@ -20,6 +20,6 @@ public class ItemRequestDto {
 
     LocalDateTime created;
 
-    List<ItemResponseDTO> items;
+    List<ItemResponseDto> items;
 
 }

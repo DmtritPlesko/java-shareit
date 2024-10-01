@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.dto.ItemResponseDTO;
+import ru.practicum.shareit.request.dto.ItemResponseDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.mapper.ItemResponseDtoMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -46,13 +46,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> getRequestsByUserId(Long userId) {
 
-        List<ItemResponseDTO> itemResponseDTOList = itemRepository.getItemByUserId(userId).stream()
+        List<ItemResponseDto> itemResponseDtoList = itemRepository.getItemByUserId(userId).stream()
                 .map(itemResponseDtoMapper::parseItemInItemResponseDto)
                 .toList();
 
         return requestRepository.findByRequesterIdOrderByCreatedDesc(userId).stream()
                 .map(itemRequestMapper::parseItemRequestInItemRequestDto)
-                .peek(elem -> elem.setItems(itemResponseDTOList))
+                .peek(elem -> elem.setItems(itemResponseDtoList))
                 .toList();
     }
 
@@ -69,11 +69,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         ItemRequestDto itemRequestDto = itemRequestMapper.parseItemRequestInItemRequestDto(getRequestById(requestId));
 
-        List<ItemResponseDTO> itemResponseDTOList = itemRepository.getItemByRequestId(requestId).stream()
+        List<ItemResponseDto> itemResponseDtoList = itemRepository.getItemByRequestId(requestId).stream()
                 .map(itemResponseDtoMapper::parseItemInItemResponseDto)
                 .toList();
 
-        itemRequestDto.setItems(itemResponseDTOList);
+        itemRequestDto.setItems(itemResponseDtoList);
 
         return itemRequestDto;
     }
