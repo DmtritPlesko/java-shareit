@@ -1,5 +1,6 @@
 package ru.practicum.item;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +25,14 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> createNewComment(@PathVariable("itemId") Long itemId,
-                                                   @RequestBody CommentDto commentDto,
+                                                   @RequestBody @Valid CommentDto commentDto,
                                                    @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemClient.createNewComment(itemId, commentDto, ownerId);
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> updateItem(@PathVariable("itemId") @Positive Long itemId,
-                                             @RequestBody ItemDto item,
+                                             @RequestBody @Valid ItemDto item,
                                              @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId) {
         return itemClient.update(itemId, item, ownerId);
     }

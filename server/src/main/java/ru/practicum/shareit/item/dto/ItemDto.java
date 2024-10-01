@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,13 +15,10 @@ public class ItemDto {
 
     Long id;
 
-    @NotBlank
     String name;
 
-    @NotBlank
     String description;
 
-    @NotBlank
     Boolean available;
 
     Long requestId;

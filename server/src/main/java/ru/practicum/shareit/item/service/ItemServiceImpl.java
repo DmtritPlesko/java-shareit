@@ -19,8 +19,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,14 +62,11 @@ public class ItemServiceImpl implements ItemService {
                 .filter(elem -> Objects.equals(elem.getItem().getId(), itemId))
                 .findFirst();
 
-        ZonedDateTime zdt = ZonedDateTime.now(ZoneId.of("Europe/Astrakhan"));
-        commentDto.setCreated(zdt.toLocalDateTime());
+//        ZonedDateTime zdt = ZonedDateTime.now(ZoneId.of("Europe/Astrakhan"));
+        commentDto.setCreated(LocalDateTime.now());
         commentDto.setAuthorName(userService.getUserById(userId).getName());
         commentDto.setItem(optionalBooking.get().getItem());
         commentDto.setAuthorName(userService.getUserById(userId).getName());
-
-
-        System.out.println("qowpkfoqwkfopkqwpofkqwkp" + commentDto + "BOOKING" + optionalBooking);
 
         if (optionalBooking.get().getBooker().getId().equals(userId) &&
                 optionalBooking.get().getEnd().isBefore(commentDto.getCreated())) {

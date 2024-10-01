@@ -30,7 +30,7 @@ class ItemRequestDtoTest {
         itemRequestDto.setId(1L);
         itemRequestDto.setDescription("HALLOW");
         itemRequestDto.setCreated(time);
-        itemRequestDto.setItemResponseDTOList(new ArrayList<>());
+        itemRequestDto.setItemResponseDtoList(new ArrayList<>());
 
         String json = objectMapper.writeValueAsString(itemRequestDto);
 
@@ -53,7 +53,7 @@ class ItemRequestDtoTest {
         assertThat(itemRequestDto.getId()).isEqualTo(1L);
         assertThat(itemRequestDto.getDescription()).isEqualTo("HALLOW");
         assertThat(itemRequestDto.getCreated()).isEqualTo(LocalDateTime.of(2024, 9, 12, 12, 24));
-        assertThat(itemRequestDto.getItemResponseDTOList()).isEmpty();
+        assertThat(itemRequestDto.getItemResponseDtoList()).isEmpty();
     }
 
 }

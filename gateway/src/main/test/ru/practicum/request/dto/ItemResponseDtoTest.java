@@ -10,8 +10,8 @@ import org.springframework.test.context.ContextConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-@ContextConfiguration(classes = {ItemResponseDTO.class})
-class ItemResponseDTOTest {
+@ContextConfiguration(classes = {ItemResponseDto.class})
+class ItemResponseDtoTest {
 
     @Autowired
     ObjectMapper objectMapper;
@@ -19,7 +19,7 @@ class ItemResponseDTOTest {
     @Test
     void testSerializable() throws JsonProcessingException {
 
-        ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+        ItemResponseDto itemResponseDTO = new ItemResponseDto();
 
         itemResponseDTO.setItemId(1L);
         itemResponseDTO.setItemOwnerId(2L);
@@ -38,7 +38,7 @@ class ItemResponseDTOTest {
     void testDeSerializable() throws JsonProcessingException {
         String json = "{\"itemId\":1,\"itemName\":\"Jim\",\"itemOwnerId\":2}";
 
-        ItemResponseDTO itemResponseDTO = objectMapper.readValue(json, ItemResponseDTO.class);
+        ItemResponseDto itemResponseDTO = objectMapper.readValue(json, ItemResponseDto.class);
 
         assertThat(itemResponseDTO.getItemId()).isEqualTo(1);
         assertThat(itemResponseDTO.getItemName()).isEqualTo("Jim");

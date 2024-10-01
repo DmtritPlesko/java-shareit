@@ -16,7 +16,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -58,8 +57,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAllRequests() {
-        return requestRepository.findAll().stream()
-                .sorted(Comparator.comparing(ItemRequest::getCreated))
+        return requestRepository.findAllByOrderByCreatedDesc().stream()
                 .map(itemRequestMapper::parseItemRequestInItemRequestDto)
                 .toList();
     }
@@ -80,7 +78,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequest getRequestById(Long requestId) {
-        return requestRepository.findById(requestId).orElseThrow(() -> new RuntimeException("НЕТ ТАКОГО"));
+        return requestRepository.findById(requestId).orElseThrow(() ->
+                new RuntimeException("Сущность request с id = 1 не найдена"));
     }
 
     private void validation(ItemRequestDto itemRequestDto) {

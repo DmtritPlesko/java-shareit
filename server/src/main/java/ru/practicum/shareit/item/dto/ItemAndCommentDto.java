@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class ItemAndCommentDto {
 
     Long id;

@@ -1,5 +1,6 @@
 package ru.practicum.request;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ public class RequestController {
 
     @PostMapping
     public ResponseEntity<Object> addNewRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                @RequestBody ItemRequestDto itemRequestDto) {
+                                                @Valid @RequestBody ItemRequestDto itemRequestDto) {
         return requestClient.addRequest(userId, itemRequestDto);
     }
 
